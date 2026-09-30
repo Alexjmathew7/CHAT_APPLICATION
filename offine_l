@@ -1,0 +1,52 @@
+ALEX J MATHEW
+	
+Sep 29, 2026, 8:05 PM (13 hours ago)
+	
+	
+to me
+Step 1: Create the static folders
+
+Run this in your project folder (the one with app.py), while you're online:
+
+mkdir -p static/js static/css
+
+Step 2: Download the libraries
+
+curl -L -o static/js/marked.min.js https://cdn.jsdelivr.net/npm/marked/marked.min.js
+curl -L -o static/js/highlight.min.js https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js
+curl -L -o static/css/github-dark.min.css https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css
+
+On Windows, if curl isn't available, open each URL in your browser and use Save As into those folders.
+Step 3: Find the CDN tags in your HTML
+
+Open templates/index.html and search for cdn, jsdelivr, cdnjs, or unpkg. Note every external <script src="https://..."> and <link href="https://...">.
+Step 4: Replace them with local paths
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/github-dark.min.css') }}">
+<script src="{{ url_for('static', filename='js/marked.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/highlight.min.js') }}"></script>
+
+Keep the order: marked and highlight must load before your own app.js.
+Step 5: Move your own JS and CSS into static (if needed)
+
+Your repo has app.js and style.css in the root folder. Flask only serves files from static/, so if index.html references them, move them and update the tags:
+
+mv app.js static/js/app.js
+mv style.css static/css/style.css
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+If they already load fine, leave them alone.
+Step 6: Check for other CDN assets
+
+Fonts (Google Fonts), icons (Font Awesome), or a copy-button library may also load from the internet. Download them the same way, or the layout will still break offline.
+Step 7: Test offline
+
+    Restart the app with python app.py.
+    Turn off your internet (keep LM Studio running).
+    Hard refresh the page with Ctrl + Shift + R.
+    Ask for code, for example "Write a Python binary search."
+    Press F12 and open the Network tab. Everything should load from 127.0.0.1:5000 with no red failed requests.
+
+If code still shows unformatted, send me your index.html and the JS that renders the AI messages, and I'll find the exact problem.
